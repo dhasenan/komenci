@@ -1,9 +1,12 @@
 {
-	"name": "initd",
+	"name": "komenci",
 	"authors": [
 		"dhasenan"
 	],
 	"description": "Linux init system",
 	"copyright": "Copyright © 2017, dhasenan",
-	"license": "Ms-PL"
+	"license": "Ms-PL",
+	"dependencies": {
+		"dyaml": "~>0.6.3"
+	}
 }

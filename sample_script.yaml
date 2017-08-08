@@ -1,0 +1,30 @@
+mount:
+  runlevel: single
+  # mount -a ensures that every filesystem mentioned in fstab is mounted.
+  # However, it doesn't ensure they're mounted with the correct options.
+  # So, we run mount -a, then we see if we need to remount /.
+  # Not all systems require this. We try to detect if you want / to be readonly
+  # and only remount in that case. However, we don't guarantee that this is
+  # correct, so feel free to edit as necessary.
+  script: |
+    mount -a
+    if cat /etc/fstab | egrep '\s/\s' | awk '{print $4}' | egrep -v [\s,]ro[\s,] ; then
+      mount -o remount,rw /
+    fi
+
+
+network:
+  runlevel: multiuser
+  depends: [mount]
+  script: |
+    for iface in $(ip -o link list | cut -f2 -d:); do
+      ifconfig $iface up
+    done
+
+apache:
+  depends: [network, mount]
+  runlevel: multiuser
+  service:
+    up: apachectl start
+    down: apachectl stop
+    status: "! (apachectl status 2>&1 | grep Alert)"
